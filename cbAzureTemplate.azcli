@@ -1,0 +1,103 @@
+# TO configure azure cli
+az configure
+# To Login to Azure account
+az login
+
+# Variable
+$rgName ='rg-armtemplate'
+$location = 'East US'
+
+# Create a azure resource group
+az group create `
+  --name $rgName `
+  --location $location
+
+# List Groups
+az group list
+# az group list -o table
+az group list --output table
+
+#create the template resource
+$templatefile = 'cbazuretemplate.json'
+$templatename = 'resourcesTemplate'
+$storageName = 'cbstorage1234'
+
+#create the template parameters
+$templatefile = 'cbazuretemplate.json'
+$templatename = 'parametersTemplate'
+$storageName = 'cbstorage1234'
+
+#create the template parameters
+$templateFile = 'cbazuretemplate.json'
+$templateName = 'parametersTemplate'
+$storageName = 'cbstorage1234'
+# premium lrs is not available
+#$storageSKU= 'Premium_LRS'
+$storageSKU='Standard_LRS'
+
+az group deployment create `
+  --name $templateName `
+  -g $rgName `
+  --template-file $templateFile `
+  --parameters storageName=$storageName storageSKU=$storageSKU
+
+
+#create the template location parameters
+$templateFile = 'cbazuretemplate.json'
+$templateName = 'parametersTemplate'
+$storageName = 'cbstorage1234'
+$storageSKU='Standard_LRS'
+
+#With the location as parameter
+az group deployment create -n $templateName --resource-group $rgName --template-file $templateFile --parameters storageName=$storageName
+
+
+#create the template resource for variable
+$templateFile = 'cbazuretemplate.json'
+$templateName = 'variableTemplate'
+$storageName = 'cbstorage1234'
+
+#deployment cmd
+az group deployment create `
+  --name $templateName `
+  --resource-group $rgName `
+  --template-file $templateFile `
+  --parameters storagePrefix=$storageName
+
+
+#create the template resource for variable with endpoints
+$templateFile = 'cbazuretemplate.json'
+$templateName = 'outPutTemplate'
+$storageName = 'cbout'
+
+#deployment cmd
+az group deployment create `
+  --name $templateName `
+  --resource-group $rgName `
+  --template-file $templateFile `
+  --parameters storagePrefix=$storageName
+
+#get all storage acount
+az storage account list --output table
+
+# get all storagea account from specific group
+az storage account list --resource-group $rgName --output table
+
+# Delete resource group without prompt (in case of data)
+# az group delete -name $rgName --no-wait --yes
+
+az storage account delete --name cbstorage1234 --resource-group $rgName
+
+az storage account delete --name $storageName --resource-group $rgName --yes
+
+az group delete --name $rgName --no-wait --yes
+
+
+#query
+az storage account list -g $rgName --query '[].name' -o json
+
+#
+az storage account list -g $rgName --query '[].{Name:name,Location:location,Kind:kind}' -o json
+
+#table
+az storage account list -g $rgName --query '[].{Name:name,Location:location,Kind:kind}' -o table
